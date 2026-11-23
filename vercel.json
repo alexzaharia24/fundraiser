@@ -1,6 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "vite",
+  "proxy": {
+    "entrypoint": "admin-auth.js",
+    "matcher": "/admin/:path*"
+  },
   "rewrites": [
     {
       "source": "/(.*)",

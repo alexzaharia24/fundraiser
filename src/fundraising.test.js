@@ -1,6 +1,17 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { formatAmount, formatInputAmount, parseAmount, parseDonation } from './fundraising.js'
+import { formatAmount, formatInputAmount, GOAL_STORAGE_KEY, parseAmount, parseDonation, readLegacyAmounts, STORAGE_KEY } from './fundraising.js'
+
+test('offers unsynced browser amounts for review without replacing shared values', () => {
+  const values = { [STORAGE_KEY]: '123450', [GOAL_STORAGE_KEY]: '500000' }
+  const storage = { getItem: key => values[key] ?? null }
+  const legacy = readLegacyAmounts({ total: false, goal: false }, storage)
+  assert.deepEqual(legacy.total, { found: true, draft: '1234,5', error: '' })
+  assert.deepEqual(legacy.goal, { found: true, draft: '5000', error: '' })
+  assert.equal(readLegacyAmounts({ total: true, goal: true }, storage).total.found, false)
+  values[STORAGE_KEY] = 'invalid'
+  assert.match(readLegacyAmounts({ total: false, goal: true }, storage).total.error, /nu este validă/)
+})
 
 test('formats saved totals as editable values without grouping separators', () => {
   for (const bani of [0, 1, 10, 123, 153200, 9007199254740991]) {

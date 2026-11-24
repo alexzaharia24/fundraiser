@@ -1,7 +1,7 @@
 import { createHash, timingSafeEqual } from 'node:crypto'
 import { next } from '@vercel/functions'
 
-export default function adminAuth(request) {
+export function authenticationError(request) {
   const password = process.env.ADMIN_PASSWORD
 
   if (!password) {
@@ -18,7 +18,7 @@ export default function adminAuth(request) {
   const digest = value => createHash('sha256').update(value).digest()
 
   if (username === 'admin' && timingSafeEqual(digest(suppliedPassword), digest(password))) {
-    return next()
+    return null
   }
 
   return new Response('Authentication required.', {
@@ -28,4 +28,8 @@ export default function adminAuth(request) {
       'Cache-Control': 'no-store',
     },
   })
+}
+
+export default function adminAuth(request) {
+  return authenticationError(request) ?? next()
 }

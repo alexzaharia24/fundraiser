@@ -7,6 +7,10 @@
   },
   "rewrites": [
     {
+      "source": "/admin/settings",
+      "destination": "/api/settings"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
